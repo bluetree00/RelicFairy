@@ -140,7 +140,7 @@ public sealed class BaseCampObjectiveGuide : MonoBehaviour
             m.Group.alpha = m.Alpha;
         }
 
-        int altarKey = _altarAffordable * 1000 + _altarWaiting;   // 제단 줄의 셈이 바뀌어도 다시 쓴다
+        int altarKey = (_altarAffordable * 1000 + _altarWaiting) * 2 + (int)Loc.Current;   // 제단 줄의 셈 · 언어가 바뀌어도 다시 쓴다
         if (mask != _trackerMask || ((mask & (1 << Altar)) != 0 && altarKey != _trackerAltarKey))
         {
             _trackerMask = mask;
@@ -275,10 +275,11 @@ public sealed class BaseCampObjectiveGuide : MonoBehaviour
     /// <summary>제단 줄 — 「기억의 제단 — 열 수 있는 것 N · 받을 업적 M」(있는 것만).</summary>
     private void AppendAltarLine()
     {
-        _sb.Append("기억의 제단 — ");
-        if (_altarAffordable > 0) _sb.Append("열 수 있는 것 ").Append(_altarAffordable);
+        // 조각마다 번역 — 숫자가 붙은 줄은 통째로는 표에 없어 영어 화면에서도 한글로 남았다(11-06 거점 스크린샷)
+        _sb.Append(Loc.T("기억의 제단 — "));
+        if (_altarAffordable > 0) _sb.Append(Loc.T("열 수 있는 것 ")).Append(_altarAffordable);
         if (_altarAffordable > 0 && _altarWaiting > 0) _sb.Append(" · ");
-        if (_altarWaiting > 0) _sb.Append("받을 업적 ").Append(_altarWaiting);
+        if (_altarWaiting > 0) _sb.Append(Loc.T("받을 업적 ")).Append(_altarWaiting);
     }
 
     /// <summary>제단 셈 — 0.5초 간격(노드 31개 · 업적 목록을 매 프레임 세지 않는다).</summary>

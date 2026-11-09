@@ -15,7 +15,7 @@ public sealed class CameraUserFraming : CinemachineExtension
         ref CameraState state, float deltaTime)
     {
         if (stage != CinemachineCore.Stage.Body) return;
-        float dist = CameraUserSettings.Distance, height = CameraUserSettings.Height;
+        float dist = CameraUserSettings.Distance * PhotoMode.Zoom, height = CameraUserSettings.Height;   // 촬영 모드 [ ] 배율(평소 1)
         if (Mathf.Approximately(dist, 1f) && Mathf.Approximately(height, 1f)) return;
         var follow = vcam.Follow;
         if (follow == null) return;

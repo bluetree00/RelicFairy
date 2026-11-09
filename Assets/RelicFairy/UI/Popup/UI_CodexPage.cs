@@ -218,11 +218,11 @@ public sealed class UI_CodexPage : MonoBehaviour
                     foreach (var p in parts)
                     {
                         if (p == null || string.IsNullOrEmpty(p.effect_key)) continue;
-                        string desc = string.Join("\n", new[] { p.line1, p.line2, p.line3 }).Trim('\n');
+                        string desc = string.Join("\n", new[] { Loc.T(p.line1), Loc.T(p.line2), Loc.T(p.line3) }).Trim('\n');   // 줄마다 번역(합친 글은 표에 없다)
                         yield return new Entry
                         {
                             Name = Loc.T(p.part_name), Sub = Loc.T(relic == "gawain" ? "가웨인" : "랜슬롯") + " · " + Loc.T("기억 조각"),
-                            Desc = string.IsNullOrEmpty(desc) ? p.description : desc,
+                            Desc = string.IsNullOrEmpty(desc) ? Loc.T(p.description) : desc,
                             Active = _active.Contains("p:" + p.effect_key), Seen = CodexLog.IsSeen('p', p.effect_key),
                         };
                     }

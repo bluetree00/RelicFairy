@@ -4525,3 +4525,12 @@ Esc › 랭킹 — 모든 플레이어의 기록,Esc › Rankings — every play
 {0} 각인 ×{1},{0} imprint ×{1}
 지금 켜진 조건부 효과,Conditional Effects Active Now
 지금 조건이 충족된 효과가 없다 — 조건(체력 · 연타 · 처치 …)이 맞으면 여기 뜬다,No conditions met right now — effects appear here when their condition (HP · combo · kill …) is met
+폭발에 맞은 적 자리,where the blast-hit enemy stands
+불붙은 적 자리,where the burning enemy stands
+피 흘리는 적 자리,where the bleeding enemy stands
+저주 걸린 적 자리,where the cursed enemy stands
+감전된 적 자리,where the shocked enemy stands
+터진 적 자리,where the detonated enemy stood
+기절한 적 자리,where the stunned enemy stands
+앞 줄의 적 자리,where the previous line's enemy stands
+발동 계열 없음,No trigger families yet

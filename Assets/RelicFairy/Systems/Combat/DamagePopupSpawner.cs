@@ -80,11 +80,14 @@ public static class DamagePopupSpawner
     /// kind: 피해 출처 — 색으로 구분된다(일반/시너지/DoT).
     /// showTotal: 이어 맞힌 피해를 「누적」으로 세어 올린다(정예 · 보스 · 허수아비). targetId가 있어야 한다.
     /// </summary>
+    /// <summary>촬영 모드(<see cref="PhotoMode"/> F8)가 잠깐 끈다 — 무리 한가운데 사진에서 숫자가 겹쳐 휘두름을 가린다.</summary>
+    public static bool Suppressed;
+
     public static void Spawn(Vector3 worldPos, float damage, bool isCrit = false, int targetId = 0,
                              DamageKind kind = DamageKind.Normal, RuneElement? element = null,
                              bool merge = true, bool showTotal = false, BonusSource source = default)
     {
-        if (damage <= 0f) return;
+        if (damage <= 0f || Suppressed) return;
         if (GameRunBootstrapper.Instance?.Run?.InCutscene == true) return;   // 컷신 동안 떠오르는 글은 숨긴다(10-01 f5)
 
         if (showTotal && targetId != 0) AddToChain(worldPos, damage, targetId);

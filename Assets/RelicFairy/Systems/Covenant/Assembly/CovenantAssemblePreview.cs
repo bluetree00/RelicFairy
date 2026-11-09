@@ -128,6 +128,8 @@ public readonly struct CovenantAssemblePreview
     public string Clause(string who, string at, string area)
     {
         if (!valid) return "";
+        // 받는 쪽 조각(「맞힌 적 자리」 · 「쓰러진 자리」 …)은 한글로 넘어온다 — 틀 문장만 번역되고 조각은 한글로 남던 것(11-06 영어 스크린샷 서약 칸)
+        who = Loc.T(who); at = Loc.T(at); area = Loc.T(area);
         return effectKind switch
         {
             EffectKind.Burn       => Loc.F("{0}이 {1} 동안 불탄다(초당 공격력 {2})", who, Sec(duration), P(effective)),

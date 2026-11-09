@@ -640,7 +640,7 @@ public sealed class UI_RelicPartDraftPopup : UI_Popup
         // ① 표시(10-18) — 등급 라벨 「효과 n줄」이 ①②③ 중 몇 줄인지와 바로 맞물리게
         headText.text = c.Kind == RelicDraftCardKind.Echo || c.Kind == RelicDraftCardKind.Residue || c.Kind == RelicDraftCardKind.Evolution
             ? MemoryCardBody(c)
-            : "① " + Gild(entry?.Line(1) ?? string.Empty);
+            : "① " + Gild(Loc.T(entry?.Line(1)) ?? string.Empty);   // 11-06 — 조각 줄(CDN 표)이 영어에서도 한글로 나왔다(표엔 영어가 다 있다)
         _seenText.Append(summary.text).Append('\n').Append(headText.text).Append('\n');
 
         // ②③ — 16 · 400(잠긴 줄은 흐리게 「◇」, 이번에 열리는 줄은 금). 왼쪽 끝을 핵심 한 줄 글자에 맞춘다
@@ -1016,7 +1016,7 @@ public sealed class UI_RelicPartDraftPopup : UI_Popup
         var sb = new System.Text.StringBuilder();
         for (int n = 2; n <= 3; n++)
         {
-            var line = e.Line(n);
+            var line = Loc.T(e.Line(n));
             if (string.IsNullOrEmpty(line)) continue;
             if (n > shown && hideLocked) { locked++; continue; }
             if (sb.Length > 0) sb.Append('\n');
@@ -1058,7 +1058,7 @@ public sealed class UI_RelicPartDraftPopup : UI_Popup
         var sb = new System.Text.StringBuilder();
         for (int n = 1; n <= 3; n++)
         {
-            var line = e.Line(n);
+            var line = Loc.T(e.Line(n));
             if (string.IsNullOrEmpty(line)) continue;
             if (sb.Length > 0) sb.Append('\n');
             string mark = n == 1 ? "①" : n == 2 ? "②" : "③";

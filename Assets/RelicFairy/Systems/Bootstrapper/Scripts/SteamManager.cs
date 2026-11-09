@@ -13,6 +13,10 @@ public sealed class SteamManager : MonoBehaviour
     public static SteamManager Instance { get; private set; }
     public static bool Initialized { get; private set; }
 
+    /// <summary>에디터 또는 개발 빌드(exe 옆에 steam_appid.txt — BuildScript가 복사 · Steam 업로드본엔 없다).</summary>
+    public static bool IsDevBuild =>
+        Application.isEditor || System.IO.File.Exists(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Application.dataPath) ?? "", "steam_appid.txt"));
+
     private void Awake()
     {
         if (Instance != null)
@@ -26,18 +30,26 @@ public sealed class SteamManager : MonoBehaviour
 
 #if !UNITY_EDITOR
         // 11-06 Steam 밖에서 exe를 직접 켜면 Steam으로 다시 켠다 — Steam 없이 켜지면 계정을 몰라 Steam 계정 세이브 폴더(SaveRoot)를 못 찾아 진행이 사라진 것처럼 보였다.
-        // exe 옆에 steam_appid.txt가 있으면(개발 빌드 — BuildScript가 복사) Steam이 false를 돌려줘 그대로 켜진다. Steam 업로드에서는 그 파일을 뺀다.
-        try
+        // 개발 빌드(exe 옆 steam_appid.txt)는 다시 켜지 않는다 — Steam은 그 파일을 「작업 폴더」에서 찾아, 바로가기 · 도구로 다른 폴더에서 켜면 바로 꺼졌다(11-06 21차 부팅 확인).
+        // 대신 앱 번호를 환경 변수로 줘 어느 폴더에서 켜도 Init이 붙는다(실측: 파일 없이 SteamAppId만으로 Init 성공). Steam 업로드에서는 그 파일을 뺀다.
+        if (IsDevBuild)
         {
-            if (SteamAPI.RestartAppIfNecessary(new AppId_t(AppId)))
-            {
-                Application.Quit();
-                return;
-            }
+            System.Environment.SetEnvironmentVariable("SteamAppId", AppId.ToString());
         }
-        catch (System.DllNotFoundException e)
+        else
         {
-            Debug.LogError($"[SteamManager] steam_api64.dll을 못 찾았다 — Steam 없이 계속: {e.Message}");
+            try
+            {
+                if (SteamAPI.RestartAppIfNecessary(new AppId_t(AppId)))
+                {
+                    Application.Quit();
+                    return;
+                }
+            }
+            catch (System.DllNotFoundException e)
+            {
+                Debug.LogError($"[SteamManager] steam_api64.dll을 못 찾았다 — Steam 없이 계속: {e.Message}");
+            }
         }
 #endif
 

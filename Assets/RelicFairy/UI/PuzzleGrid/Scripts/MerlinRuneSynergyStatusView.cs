@@ -267,7 +267,7 @@ public sealed class MerlinRuneSynergyStatusView : MonoBehaviour
             return;
         }
 
-        var sb = new System.Text.StringBuilder("◆ 반응  ");
+        var sb = new System.Text.StringBuilder("◆ ").Append(Loc.T("반응")).Append("  ");   // 조립 글은 통째로 표에 없다 — 조각마다 번역(11-06 영어 룬판)
         for (int i = 0; i < reactions.Count; i++)
         {
             var d = reactions[i];
@@ -277,7 +277,7 @@ public sealed class MerlinRuneSynergyStatusView : MonoBehaviour
             sb.Append(a != null ? a.Icon : "?");
             sb.Append(b != null ? b.Icon : "?");
             sb.Append(' ');
-            sb.Append(d.DisplayName);
+            sb.Append(Loc.T(d.DisplayName));
         }
         _reactionText.text = sb.ToString();
         _reactionText.transform.SetAsFirstSibling();   // 항상 목록 맨 위

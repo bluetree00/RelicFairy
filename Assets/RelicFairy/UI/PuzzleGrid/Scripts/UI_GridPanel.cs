@@ -981,13 +981,18 @@ public sealed partial class UI_GridPanel : UI_Base
         _synergyToast = new GameObject("SynergyToast", typeof(RectTransform));
         _synergyToast.transform.SetParent(transform, false);
 
+        // 11-09 피드백 「시너지 알림이 빛 룬 가운데 줄을 막아 사라질 때까지 못 건드린다」 — 예전엔 판 위쪽(0.80~0.86)에 떠서
+        // 판 둘째 줄을 2.5초 덮고 클릭까지 먹었다. 제목 띠(위 80px) 가운데로 올려 판을 아예 안 덮고, 띠 자체도 클릭을 통과시킨다.
         var rt = _synergyToast.GetComponent<RectTransform>();
-        rt.anchorMin        = new Vector2(0.24f, 0.80f);   // 제목 띠(위 80px)를 덮지 않게 그 아래 판 위쪽에
-        rt.anchorMax        = new Vector2(0.73f, 0.86f);
-        rt.offsetMin        = Vector2.zero;
-        rt.offsetMax        = Vector2.zero;
+        rt.anchorMin        = new Vector2(0.24f, 1f);
+        rt.anchorMax        = new Vector2(0.73f, 1f);
+        rt.pivot            = new Vector2(0.5f, 1f);
+        rt.sizeDelta        = new Vector2(0f, 56f);
+        rt.anchoredPosition = new Vector2(0f, -14f);
 
-        _synergyToast.AddComponent<Image>().color = new Color(0.04f, 0.14f, 0.08f, 0.93f);
+        var plate = _synergyToast.AddComponent<Image>();
+        plate.color         = new Color(0.04f, 0.14f, 0.08f, 0.93f);
+        plate.raycastTarget = false;   // 알림 띠가 칸 클릭 · 드롭을 먹으면 배치가 막힌다
 
         var textGO = MakeTxt(_synergyToast.transform, "Text",
             "", 18f, new Color(0.3f, 1f, 0.55f, 1f));

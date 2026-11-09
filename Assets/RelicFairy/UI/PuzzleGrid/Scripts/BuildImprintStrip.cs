@@ -40,10 +40,15 @@ public sealed class BuildImprintStrip : MonoBehaviour
     private void OnEnable()
     {
         BuildImprint.Changed += Refresh;
+        Loc.LanguageChanged += Refresh;   // 이름을 여기서 번역하니 언어가 바뀌면 다시 짓고 다시 잰다
         Refresh();
     }
 
-    private void OnDisable() => BuildImprint.Changed -= Refresh;
+    private void OnDisable()
+    {
+        BuildImprint.Changed -= Refresh;
+        Loc.LanguageChanged -= Refresh;
+    }
 
     // 머리띠가 옮겨지거나(DetachEffects) 폭이 정해지면 다시 맞춘다
     private void OnRectTransformDimensionsChange()
@@ -64,12 +69,13 @@ public sealed class BuildImprintStrip : MonoBehaviour
             if (_sb.Length > 0) _sb.Append("   ");
             int next  = BuildFamilyRules.NextThreshold(c);
             int stage = BuildFamilyRules.StageOf(c);
-            _sb.Append("<color=").Append(BuildFamilyRules.Hex(f)).Append("><b>").Append(BuildFamilyRules.Label(f)).Append("</b></color> ");
+            // 이름은 여기서 번역한다 — 한글로 폭을 재 「머리띠 오른쪽에 들어간다」로 정한 뒤 안전망이 영어로 바꾸면 길어져 제목을 덮었다(11-06 영어 룬판)
+            _sb.Append("<color=").Append(BuildFamilyRules.Hex(f)).Append("><b>").Append(Loc.T(BuildFamilyRules.Label(f))).Append("</b></color> ");
             if (stage > 0) _sb.Append("<color=#E8BA54>").Append('◆', stage).Append("</color>");
             _sb.Append(c);
             if (next > 0) _sb.Append("<color=#8A8594>/").Append(next).Append("</color>");
         }
-        _text.text = _sb.Length > 0 ? _sb.ToString() : "<color=#8A8594>발동 계열 없음</color>";
+        _text.text = _sb.Length > 0 ? _sb.ToString() : "<color=#8A8594>" + Loc.T("발동 계열 없음") + "</color>";
         FitRow();
     }
 
@@ -82,6 +88,7 @@ public sealed class BuildImprintStrip : MonoBehaviour
         var rt = _text.rectTransform;
         _text.enableAutoSizing = false;
         _text.fontSize = _text.fontSizeMin;
+        _text.textWrappingMode = TextWrappingModes.NoWrap;   // 한 줄 폭으로 잰다 — 앞서 「아래」로 내려 줄바꿈이 켜진 채 재면 가장 긴 낱말 폭만 나와 「들어간다」로 잘못 정했다(번갈아 겹침 · 11-06)
         bool below = _text.GetPreferredValues(_text.text, 0f, 0f).x > w * (InlineMax - InlineMin);
         float h = 0f;
         if (below)

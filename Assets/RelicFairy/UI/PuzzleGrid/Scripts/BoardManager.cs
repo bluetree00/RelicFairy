@@ -172,6 +172,8 @@ public class BoardManager : MonoBehaviour
                 foreach (var t in found)
                     if (t.gameObject.name == "GridNameText") { gridNameText = t; break; }
         }
+        // 11-09 피드백 「빛 룬 가운데 줄을 못 건드린다」 — 이 글자 칸(보통 빈 글)이 판 위쪽 가운데 칸 3개를 덮고 클릭을 먹었다. 글자는 클릭을 받지 않는다.
+        if (gridNameText != null) gridNameText.raycastTarget = false;
 
         // BackButton 자동 탐색 및 연결
         if (backButton == null)
