@@ -2317,6 +2317,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Abyss.Monster.DeathKnightBossMonster
   _debugState: 
+  _bossDisplayName: "\uD0C0\uB77D\uD55C \uBAA8\uB974\uB4DC\uB808\uB4DC"
   _bodyRenderers: []
   _swordCtrl: {fileID: 0}
   _auraAnchor: {fileID: 0}
@@ -2324,6 +2325,7 @@ MonoBehaviour:
     type: 3}
   _blackAuraPrefab: {fileID: 4832121135125949560, guid: d67be8e74f13e26429aece1e53a117b7,
     type: 3}
+  _windowRenderers: []
   _attackPool:
   - {fileID: 11400000, guid: a7323ceaf1a96b246bb54a211f51df1f, type: 2}
   - {fileID: 11400000, guid: ab31f0eb2d931fb4fa3feb334a8829b2, type: 2}
@@ -4951,6 +4953,7 @@ SkinnedMeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: c10beef8705cec54eafadcf1941d26ea, type: 2}
+  - {fileID: 2100000, guid: 2b0a73470c5ccb3459b5a08ddd5d7dd2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6097,6 +6100,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
+  - {fileID: 2100000, guid: 2bb209df68f294a4a8f9c7ec33ccc4ed, type: 2}
   - {fileID: 2100000, guid: 2bb209df68f294a4a8f9c7ec33ccc4ed, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
