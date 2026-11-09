@@ -98,6 +98,23 @@ public static class Defect1109ProbeEditor
             }
         }
 
+        // ④ 인게임 분홍 감시 「재질 없음」 — 원본 프리팹에서 어느 칸이 비었나(꼬리 칸이면 꼬리 기능이 켜졌나)
+        sb.AppendLine("④ 파티클 재질 칸(원본)");
+        foreach (var name in new[] { "Star aura", "Boss Seal Sigil", "Boss Seal Complete", "Fairy_Spring", "ProcRoom_ch3_rest_sacred_01" })
+        {
+            string pp = AssetDatabase.FindAssets(name + " t:Prefab").Select(AssetDatabase.GUIDToAssetPath).FirstOrDefault(x => Path.GetFileNameWithoutExtension(x) == name);
+            var root = pp != null ? AssetDatabase.LoadAssetAtPath<GameObject>(pp) : null;
+            if (root == null) { sb.AppendLine($"  {name} 프리팹 없음"); continue; }
+            foreach (var psr in root.GetComponentsInChildren<ParticleSystemRenderer>(true))
+            {
+                var ps = psr.GetComponent<ParticleSystem>();
+                bool trails = ps != null && ps.trails.enabled;
+                bool mainNull = psr.sharedMaterial == null, trailNull = psr.trailMaterial == null;
+                if (!mainNull && !(trails && trailNull) && !trailNull) continue;
+                sb.AppendLine($"  {name} › {HierPath(psr.transform, root.transform)} · 렌더러 {psr.enabled} · 모드 {psr.renderMode} · 본 재질 {(mainNull ? "없음" : psr.sharedMaterial.name)} · 꼬리 기능 {trails} · 꼬리 재질 {(trailNull ? "없음" : psr.trailMaterial.name)}");
+            }
+        }
+
         Directory.CreateDirectory("Temp");
         File.WriteAllText(Out, sb.ToString());
         Debug.Log("[Defect1109] 끝\n" + sb.ToString(0, Mathf.Min(sb.Length, 2500)));
