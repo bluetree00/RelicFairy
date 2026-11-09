@@ -20,11 +20,14 @@ public static class AddressablesPlayModeFixEditor
 {
     // 재생 모드 빌더 배열: 0 = Use Asset Database(FastMode), 1 = Simulate Groups, 2 = Use Existing Build
     private const int FastModeIndex = 0;
+    public  const string AllowPackedPlayModeKey = "RF.AllowPackedPlayMode";
 
     static AddressablesPlayModeFixEditor()
     {
         // 설정 에셋이 아직 없으면(최초 임포트 등) 조용히 넘어간다.
         if (AddressableAssetSettingsDefaultObject.Settings == null) return;
+        // 번들 무결성 검사(11-09) 동안은 「기존 빌드 사용」을 그대로 둔다 — 검사 메뉴의 준비/되돌리기가 이 표시를 켜고 끈다.
+        if (EditorPrefs.GetBool(AllowPackedPlayModeKey)) return;
 
         if (ProjectConfigData.ActivePlayModeIndex != FastModeIndex)
         {
