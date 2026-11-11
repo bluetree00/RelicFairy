@@ -189,7 +189,7 @@ public class DKCrossFlipState : FullLockState<DKCrossFlipPatternSO>
             GameObject   prefab = color == DKSwordColor.White ? Data.whiteTilePrefab : Data.blackTilePrefab;
             if (prefab == null) continue;
 
-            Vector3    pos = _zone.CellCenter(x, z) + Vector3.up * TileY;
+            Vector3    pos = DKBossRoomContext.TileToWorld(x, z, TileY);   // 칸마다 실제 바닥 위(11-11)
             GameObject go  = BossEffectPool.Spawn(prefab, pos, Quaternion.Euler(-90f, 0f, 0f));
             if (go == null) continue;
             go.transform.localScale = Vector3.one * cs;

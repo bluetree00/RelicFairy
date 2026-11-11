@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// 시기별 레벨디자인 수치 한 표(10-01, 순환 개정 v3 §4-2 + 보상 차등) — 봉인기 · 해방기(첫 리치 붕괴 뒤) · 악몽 모드.
 /// 봉인기는 지금 수치 그대로(×1). 해방기부터 몬스터가 세지고 많아지는 만큼 보상(룬 등급 · 연료 · 골드)도 오른다.
-/// 보스는 여기서 세지지 않는다 — 보스의 시기 차이는 페이지(해방 2페이지 · 악몽 강화)가 맡는다.
+/// 보스는 몬스터 배율 대신 <see cref="BossHpScale"/>(Ch3 · Ch4 체력)만 받는다 — 나머지 시기 차이는 페이지(해방 2페이지 · 악몽 강화)가 맡는다.
 ///
 /// 꽂히는 곳: 몬스터 스탯 = <c>GameRunSession.CurrentDifficultyScaleFor</c> · 수량 = <c>CurrentMonsterCountScale</c> ·
 /// 정예 확률 = <c>RunSequencer.RollKind</c> · 룬 등급 가중 · 연료 = <c>RoomRewardTable.For</c> · 골드 = <c>GameRunSession.AddGold</c> ·
@@ -65,9 +65,19 @@ public static class EraBalance
     // 봉인기보다 조금만 높게, Ch2부터 크게 오른다. 시기 몫 = 1 + (시기 배율 − 1) × 램프 · Ch4 = 표 값 그대로.
     private static readonly float[] ChapterRamp = { 0.35f, 0.7f, 0.9f, 1.0f };
 
+    // 11-11 사용자 「Ch3~4부터 룬 · 무기 재련이 겹쳐 화력이 강해진다 — 보스가 유의미한 체력을(1.5~2배)」 · 리뷰 「해방기 후반 3~4 보스 체력이 너무 낮다」.
+    // 해방기 · 악몽 보스 체력 배율 — 2페이지 몫(BossPages) · 악몽 배율(×1.15 · 리치 ×1.1) 위에 곱한다. 봉인기 · Ch1 · Ch2는 1.
+    // Ch3 기사 = 40,000 × (1 + 2페이지 1.0) × 1.53 = 122,400(11-10까지 68,000의 ×1.8 · 1 · 2페이지 61,200씩) · Ch4 리치 = 140,000 × 1.5 = 210,000.
+    // 근거: 10-17 대표 빌드를 11-11 코드로 다시 잼(Temp/ldsim_build_dps.txt) — 해방 기사 순수 52~54 → 94~98초 · 리치 81~100 → 122~149초(봉인기 목표 98 · 120초).
+    private static readonly float[] LiberatedBossHp = { 1f, 1f, 1.53f, 1.5f };
+
     /// <summary>시기 배율을 챕터 램프만큼만 건다(봉인기 1이면 그대로 1). <paramref name="chapter"/> = 1 ~ 4.</summary>
     public static float Ramp(float eraScale, int chapter)
         => 1f + (eraScale - 1f) * ChapterRamp[Mathf.Clamp(chapter, 1, ChapterRamp.Length) - 1];
+
+    /// <summary>해방기 · 악몽 보스 체력 배율(봉인기 1). <paramref name="chapter"/> = 보스의 챕터 1 ~ 4.</summary>
+    public static float BossHpScale(int chapter)
+        => StoryProgress.IsLiberated ? LiberatedBossHp[Mathf.Clamp(chapter, 1, LiberatedBossHp.Length) - 1] : 1f;
 
     public static Spec For(StoryEra era) => era switch
     {

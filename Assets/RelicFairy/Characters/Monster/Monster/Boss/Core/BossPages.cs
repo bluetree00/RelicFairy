@@ -7,7 +7,7 @@ namespace RelicFairy.Monster
 /// 보스 2페이지(해방 페이지) 공용 부품 — 숲의 수호자 · 화룡 · 죽음의 기사가 들고 있는 일반 객체(09-28 설계 확정 §2).
 ///
 /// 해방기부터(<see cref="StoryProgress.IsLiberated"/>) 켜진다 — 봉인이 풀려야 두 번째 힘이 열린다(09-29 시기별 페이지). 켜지면
-///   · 총 체력 = 기존 × (1 + <see cref="Page2Share"/>) — 두 줄 체력바. 1페이지 = 기존 체력 · 2페이지 = 기존 × 0.4.
+///   · 총 체력 = 기존 × (1 + <see cref="Page2Share"/>) × 시기 보스 체력(<see cref="EraBalance.BossHpScale"/>) — 두 줄 체력바. 2페이지 = 1페이지 × <see cref="Page2Share"/>(챕터별).
 ///   · 1페이지 동안 체력은 2페이지 몫 아래로 내려가지 않는다(<see cref="HpFloor"/>) → 전환 패턴이 무적으로 연출 → 2페이지.
 ///   · 보스가 스스로 읽는 체력 비율(<see cref="PhaseRatio"/>)은 1페이지에선 1페이지 기준(1→0)이라
 ///     기존 페이즈 · 소환 · 광폭 경계가 코드 수정 없이 1페이지 안에서 그대로 돈다. 2페이지에선 기존 체력 기준(0.4→0).
@@ -17,15 +17,20 @@ namespace RelicFairy.Monster
 public sealed class BossPages
 {
     // ── Constants ──────────────────────────────────────────────
-    public const float DefaultPage2Share = 0.7f;   // 2페이지 체력 = 기존 × 0.7 (D1 더하기 · 10-22 A10 D4 = 10-17 권장 A 0.4 → 0.7 — 해방 페이지 노출 11 → 약 20초)
     public const float SignatureAt       = 0.5f;   // 2페이지 체력 이 비율에서 간판 패턴 한 번
     public const float LateBreakScale    = 0.75f;  // 간판 뒤(후반) 패턴 사이 쉬는 시간 배율 — 2페이지 구성 §9
     public const float NightmareBreakScale = 0.8f; // 악몽 모드 — 패턴 사이 쉬는 시간 배율(시기별 페이지 §2-1, 강화 1차)
     public const float NightmareHpScale    = 1.15f; // 악몽 모드 — 총 체력 배율(레벨디자인 설계서 §6). 보스는 시기 스탯 배율(×1.4)에서 빠져 있다
 
+    // ── Static ─────────────────────────────────────────────────
+    // 2페이지 체력 = 1페이지 × 몫(Ch1 숲 · Ch2 화룡 · Ch3 기사). 10-22 A10 D4 0.4 → 0.7(해방 페이지 노출 11 → 약 20초) ·
+    // 11-11 사용자 「2페이지 체력을 전체적으로 늘리되 1챕터는 조금만」 → 숲 0.85 · 화룡 · 기사 1.0(1 · 2페이지 반반).
+    private static readonly float[] Page2ShareByChapter = { 0.85f, 1.0f, 1.0f };
+
     // ── Private ────────────────────────────────────────────────
     private readonly MonsterBase _boss;
     private readonly float[]     _markers;
+    private readonly float       _eraHpScale;   // 시기 보스 체력(EraBalance.BossHpScale) — 전투마다 만들 때 정한다
     private int  _page    = 1;
     private int  _hudPage = 1;
     private bool _transitioning;
@@ -50,7 +55,7 @@ public sealed class BossPages
     public float BreakScale    => (IsLate ? LateBreakScale : 1f) * (NightmareMode ? NightmareBreakScale : 1f);
 
     /// <summary>총 체력 배율 — MonsterBase.BossHpScale로 넘긴다. 악몽 모드는 ×<see cref="NightmareHpScale"/>(페이지 몫 비율은 그대로).</summary>
-    public float HpScale => Enabled ? (1f + Page2Share) * (NightmareMode ? NightmareHpScale : 1f) : 1f;
+    public float HpScale => Enabled ? (1f + Page2Share) * (NightmareMode ? NightmareHpScale : 1f) * _eraHpScale : 1f;
 
     /// <summary>2페이지 몫 체력(HP 수치).</summary>
     public int Page2Hp => Enabled ? Mathf.CeilToInt(_boss.EffectiveMaxHp * Page2Share / (1f + Page2Share)) : 0;
@@ -65,12 +70,14 @@ public sealed class BossPages
     public event Action             HudPageMarkersChanged;
 
     // ── Constructor ────────────────────────────────────────────
-    public BossPages(MonsterBase boss, bool enabled, float page2Share = DefaultPage2Share)
+    public BossPages(MonsterBase boss, bool enabled)
     {
         _boss      = boss;
         Enabled    = enabled && boss != null;
         NightmareMode = Enabled && StoryProgress.IsNightmareMode;
-        Page2Share = Mathf.Max(0.01f, page2Share);
+        int chapter = ChapterOf(boss);
+        Page2Share  = Page2ShareByChapter[chapter - 1];
+        _eraHpScale = Enabled ? EraBalance.BossHpScale(chapter) : 1f;
         _markers   = Enabled ? new[] { Page2Share / (1f + Page2Share) } : null;
     }
 
@@ -140,6 +147,16 @@ public sealed class BossPages
 
     /// <summary>전환이 끊겼을 때(보스 비활성 등) — 다시 시도할 수 있게.</summary>
     public void AbortTransition() => _transitioning = false;
+
+    // ── Private Methods ────────────────────────────────────────
+
+    /// <summary>보스의 챕터(1 ~ 3) — 이야기 보스 id로 정한다(런 상태와 무관 · 테스트 씬에서도 같은 값). 모르는 보스는 1.</summary>
+    private static int ChapterOf(MonsterBase boss) => (boss as IPagedBoss)?.StoryBossId switch
+    {
+        StoryProgress.Dragon      => 2,
+        StoryProgress.DeathKnight => 3,
+        _                         => 1,
+    };
 }
 
 /// <summary>2페이지 보스 — 전환 패턴이 부르는 훅.</summary>

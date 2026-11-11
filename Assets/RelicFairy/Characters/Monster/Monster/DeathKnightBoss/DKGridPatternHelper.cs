@@ -39,6 +39,9 @@ public static class DKGridPatternHelper
     // 순차 베기(피라미드 · 일반 베기)는 실제 맞는 줄보다 2~3줄 뒤처져 보였다(10-24 사용자 「공격 범위랑 가이드라인이랑 다른 것도」).
     private const float SlashImpactAt   = 0.51f;
     private const float SlashImpactLead = 0.05f;   // 건너뛴 뒤 충격까지 — 판정 프레임과 거의 같이
+    // 베기 충격의 바닥 조각 — 돌 조각(SmallStones) · 바닥 갈라짐(GroundCrack)이 줄마다 솟았다 가라앉아 「바닥 타일이 튀어나오거나 들어간다 · 망가진다」로
+    // 읽혔다(11-11 사용자 Ch3 보스방). 베임 · 섬광 · 불꽃 · 연기는 그대로. 풀에서 다시 꺼내도 꺼진 채다.
+    private static readonly string[] SlashFloorDebris = { "SmallStones", "GroundCrack" };
     // ── 칸 예고 색(10-23 가이드 색 통일 — 「실제로 맞는 칸 = 빨강」 한 가지 규칙) ──────────
     // 맞는 칸: 깔리는 순간 공용 공격 색(PatternGuideHelper.AttackFill)으로 차오름 → 판정 ArmLead초 전 신호 빨강(Active) · 더 밝게.
     // 안 맞는 칸: 흑/백 그림 대신 옅은 무채색 하나(검 색은 검 · 갑옷 · 베기 이펙트가 알린다). 어두운 바닥 · 유리 결계 너머에서도 읽히게 발광을 준다.
@@ -113,7 +116,7 @@ public static class DKGridPatternHelper
             GameObject prefab = color == DKSwordColor.White ? whitePrefab : blackPrefab;
             if (prefab == null) continue;
 
-            Vector3 worldPos = DKBossRoomContext.CellToWorld(cell.x, cell.y, yOffset);
+            Vector3 worldPos = DKBossRoomContext.TileToWorld(cell.x, cell.y, yOffset);   // 칸마다 실제 바닥 위(11-11 — 높은 바닥 조각에 묻혔다)
             // Quad 노말이 +Z → -90° X 회전으로 +Y(위)를 향하게
             GameObject go = BossEffectPool.Spawn(prefab, worldPos, Quaternion.Euler(-90f, 0f, 0f));
             if (go == null) continue;
@@ -566,6 +569,8 @@ public static class DKGridPatternHelper
         if (go != null)
         {
             BossPageTransitionState.ToneRoarVfx(go, Color.clear);   // 굴절층 끔 — 줄마다 흰 일그러짐이 겹쳤다(10-13 검증)
+            foreach (var t in go.GetComponentsInChildren<Transform>())
+                if (t != go.transform && Array.IndexOf(SlashFloorDebris, t.name) >= 0) t.gameObject.SetActive(false);
             BossEffectPool.ScheduleRelease(go, Mathf.Min(BossEffectPool.CalculateLifetime(prefab, 2.5f), SlashVfxMaxSeconds));
         }
         return go;
@@ -610,7 +615,7 @@ public static class DKGridPatternHelper
         {
             int     tx        = tile.Cell.x;
             int     tz        = tile.Cell.y;
-            Vector3 tileWorld = DKBossRoomContext.CellToWorld(tx, tz, yOffset);
+            Vector3 tileWorld = DKBossRoomContext.CellToWorld(tx, tz, 0f);
 
             foreach (var (dx, dz, isNS) in dirs)
             {
@@ -626,9 +631,10 @@ public static class DKGridPatternHelper
                 int axis   = isNS ? 0 : 1;
                 if (!processed.Add((canonX, canonZ, axis))) continue;
 
-                // 엣지 위치: 타일 중심과 이웃 중심의 중간
+                // 엣지 위치: 타일 중심과 이웃 중심의 중간 · 높이 = 두 칸 바닥 중 높은 쪽 위(11-11 — 칸이 바닥 높이를 따른다)
                 Vector3 edgePos = tileWorld
                     + new Vector3(dx * cs * 0.5f, 0f, dz * cs * 0.5f);
+                edgePos.y = Mathf.Max(DKBossRoomContext.CellFloorY(tx, tz), DKBossRoomContext.CellFloorY(nb.x, nb.y)) + yOffset;
 
                 // N/S 경계 → 엣지가 X축 방향 Euler(-90,0,0)
                 // E/W 경계 → 엣지가 Z축 방향 Euler(-90,90,0)

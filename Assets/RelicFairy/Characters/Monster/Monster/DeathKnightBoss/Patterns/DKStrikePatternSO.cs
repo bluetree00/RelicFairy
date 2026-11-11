@@ -297,7 +297,7 @@ public class DKStrikeState : FullLockState<DKStrikePatternSO>
     private void SpawnOneTile(int x, int z, GameObject prefab)
     {
         if (!DKBossRoomContext.IsInterior(x, z)) return;
-        Vector3    pos = DKBossRoomContext.CellToWorld(x, z, 0.05f);
+        Vector3    pos = DKBossRoomContext.TileToWorld(x, z, 0.05f);   // 칸마다 실제 바닥 위(11-11)
         GameObject go  = BossEffectPool.Spawn(prefab, pos, Quaternion.Euler(-90f, 0f, 0f));
         if (go == null) return;
         go.transform.localScale = Vector3.one * DKBossRoomContext.CellSize;

@@ -22,6 +22,7 @@ public static class LichStageShift
     private const float RiseDepth      = 45f;    // 이만큼 아래 심연에서 솟는다
     private const float OutwardPush    = 4f;     // 석상은 귀퉁이 중심에서 바깥으로 조금 — 제단 가장자리를 가리지 않게
     private const float DustScale      = 3f;
+    private const float DustEmission   = 0.35f;   // 석상 먼지 방출 배율(반복 · 광원 끔 — LichVfxScaleCache.TrimForBurst)
     private const float LightRange     = 40f;    // 석상 앞을 비추는 진홍 빛 — 어두운 보스방에서 윤곽이 보이게(09-19 실측: 발치만 비쳐 안 보였다)
     private const float LightIntensity = 30f;
     private const float LightHeight    = 11f;    // 석상 가슴~두건 높이(m) — ×8 석상은 두건이 어두웠다(09-19)
@@ -113,7 +114,8 @@ public static class LichStageShift
         light.intensity = LightIntensity;
         light.shadows   = LightShadows.None;
 
-        LichVfx.Play(LichVfxSlot.SummonGround, at, Quaternion.identity, DustScale);
+        var dust = LichVfx.Play(LichVfxSlot.SummonGround, at, Quaternion.identity, DustScale);
+        if (dust != null && dust.TryGetComponent<LichVfxScaleCache>(out var cache)) cache.TrimForBurst(DustEmission);   // 11-11 렉 — 석상 넷이 ×3 크기로 동시에
         LichPatternUtil.Impact(LichImpact.Heavy);
 
         Vector3 from = go.transform.position;

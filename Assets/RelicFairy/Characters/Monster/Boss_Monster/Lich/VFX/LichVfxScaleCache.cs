@@ -14,6 +14,7 @@ public sealed class LichVfxScaleCache : MonoBehaviour
 {
     private ParticleSystem[]                        _systems;
     private bool[]                                  _originalLoop;
+    private bool[]                                  _originalLights;
     private ParticleSystem.MinMaxGradient[]         _originalColor;
     private float[]                                 _originalRate;
     private Color                                   _appliedTint = Color.clear;
@@ -27,12 +28,14 @@ public sealed class LichVfxScaleCache : MonoBehaviour
         {
             _systems       = GetComponentsInChildren<ParticleSystem>(true);
             _originalLoop  = new bool[_systems.Length];
+            _originalLights = new bool[_systems.Length];
             _originalColor = new ParticleSystem.MinMaxGradient[_systems.Length];
             _originalRate  = new float[_systems.Length];
             for (int i = 0; i < _systems.Length; i++)
             {
                 var main = _systems[i].main;
                 _originalLoop[i]  = main.loop;
+                _originalLights[i] = _systems[i].lights.enabled;
                 _originalColor[i] = main.startColor;
                 _originalRate[i]  = _systems[i].emission.rateOverTimeMultiplier;
             }
@@ -46,6 +49,27 @@ public sealed class LichVfxScaleCache : MonoBehaviour
             if (_systems[i] == null) continue;   // 팩 StopAction · 스크립트가 자식을 스스로 파괴했다(11-02 빌드 NRE — 원소 버스트 · 저스트 회피가 끊겼다)
             var main = _systems[i].main;
             main.loop = loop || _originalLoop[i];
+            var lights = _systems[i].lights;
+            lights.enabled = _originalLights[i];   // TrimForBurst가 끈 광원을 되돌린다(같은 프리팹을 해골 소환 표식도 쓴다)
+        }
+    }
+
+    /// <summary>
+    /// (11-11 리치 렉) 여러 개가 한꺼번에 뜨는 붕괴 먼지 — 이번 재생만 반복 · 광원 모듈을 끄고 방출을 <paramref name="emission"/>배로.
+    /// 링 붕괴 한 번에 이 프리팹(입자계 7 · 반복 · 최대 1,000 · 광원 모듈 2)이 12~24개 2.25초 뿜어 50~180 ms 프레임이 2초 이어졌다(11-05 lich_spike).
+    /// 다음 <see cref="Prepare"/> · <see cref="ApplyEmission"/>이 원래 값으로 되돌린다. <see cref="Prepare"/> 뒤에 부른다.
+    /// </summary>
+    public void TrimForBurst(float emission)
+    {
+        if (_systems == null) return;
+        ApplyEmission(emission);
+        for (int i = 0; i < _systems.Length; i++)
+        {
+            if (_systems[i] == null) continue;
+            var main = _systems[i].main;
+            main.loop = false;
+            var lights = _systems[i].lights;
+            lights.enabled = false;
         }
     }
 

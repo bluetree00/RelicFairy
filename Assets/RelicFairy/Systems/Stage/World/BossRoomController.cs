@@ -22,6 +22,11 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class BossRoomController : MonoBehaviour
 {
+    // ── Constants ────────────────────────────────────────────────
+    private const float LodPopTolerance = 0.1f;   // 바닥 조각의 먼 단계 모양이 LOD0과 윗면 · 자리가 이만큼 넘게 다르면 그 단계를 뺀다(11-11)
+    private const float FlatMaxHeight   = 1.2f;   // 바닥 같은 것 — 두께가 이 아래이고 넓이가 FlatMinArea 넘음
+    private const float FlatMinArea     = 0.5f;
+
     [Header("연결 컴포넌트")]
     [Tooltip("보스 소환을 담당하는 BossSpawner. waitForExternalTrigger=true 필수.")]
     [SerializeField] private BossSpawner bossSpawner;
@@ -87,6 +92,8 @@ public class BossRoomController : MonoBehaviour
     public bool EntryDialogueAsBark  => entryDialogueAsBark;
 
     // ── Lifecycle ────────────────────────────────────────────────
+    private void Awake() => SteadyFloorLods(transform.parent != null ? transform.parent : transform);
+
     private void OnDestroy()
     {
         GameCameraController.Instance?.SetCombatFramingSuppressed(this, false);
@@ -271,6 +278,58 @@ public class BossRoomController : MonoBehaviour
             try { await UniTask.Delay(TimeSpan.FromSeconds(holdDuration), cancellationToken: ct); }
             catch (OperationCanceledException) { }
         }
+    }
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // 바닥 LOD
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    /// <summary>
+    /// 바닥 조각의 먼 LOD 단계가 가까운 단계와 모양이 크게 다르면(윗면 · 자리 0.1 m 넘게) 그 단계를 빼고 앞 단계가 그 거리까지 맡게 한다 —
+    /// 카메라가 움직일 때마다 바닥이 솟았다 꺼졌다 했다(11-11 사용자 「Ch3 보스방 바닥 타일이 튀어나오거나 들어간다」: 단 둘레 SM_TrimConcrete의 L5 · L6이
+    /// 윗면 0.10~0.23 m 높고 0.12~0.31 m 비껴 있었다 — 자리(TRS)는 정상, 팩의 단순화 메시 자체 차이). 꺼지는 거리(맨 끝 전환 높이)는 그대로.
+    /// </summary>
+    private static void SteadyFloorLods(Transform root)
+    {
+        int fixedGroups = 0;
+        foreach (var g in root.GetComponentsInChildren<LODGroup>())
+        {
+            var lods = g.GetLODs();
+            if (lods.Length < 2 || !TryBounds(lods[0], out Bounds b0)) continue;
+            if (b0.size.y > FlatMaxHeight || b0.size.x * b0.size.z < FlatMinArea) continue;
+
+            var keep = new System.Collections.Generic.List<LOD>(lods.Length) { lods[0] };
+            for (int i = 1; i < lods.Length; i++)
+            {
+                bool pops = TryBounds(lods[i], out Bounds bi)
+                            && (Mathf.Abs(bi.max.y - b0.max.y) > LodPopTolerance
+                                || new Vector2(bi.center.x - b0.center.x, bi.center.z - b0.center.z).magnitude > LodPopTolerance);
+                if (!pops) { keep.Add(lods[i]); continue; }
+                var prev = keep[keep.Count - 1];
+                prev.screenRelativeTransitionHeight = lods[i].screenRelativeTransitionHeight;   // 앞 단계가 이 단계의 거리까지
+                keep[keep.Count - 1] = prev;
+                foreach (var r in lods[i].renderers)
+                    if (r != null && System.Array.IndexOf(prev.renderers, r) < 0) r.enabled = false;   // LODGroup 밖이 되면 늘 그려진다
+            }
+            if (keep.Count == lods.Length) continue;
+            g.SetLODs(keep.ToArray());
+            fixedGroups++;
+        }
+        if (fixedGroups > 0) Debug.Log($"[BossRoom] 먼 단계 모양이 어긋난 바닥 {fixedGroups}개 — 앞 단계가 맡게 함({root.name})");
+    }
+
+    private static bool TryBounds(LOD lod, out Bounds b)
+    {
+        b = default;
+        bool any = false;
+        if (lod.renderers == null) return false;
+        foreach (var r in lod.renderers)
+        {
+            if (r == null) continue;
+            if (!any) { b = r.bounds; any = true; }
+            else b.Encapsulate(r.bounds);
+        }
+        return any;
     }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

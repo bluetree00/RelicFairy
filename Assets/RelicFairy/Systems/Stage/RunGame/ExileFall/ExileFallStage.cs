@@ -199,8 +199,13 @@ public sealed class ExileFallStage : MonoBehaviour
         if (!DungeonSpaceDirector.TryGetShaftStyle(out _particleMat, out _))
             Debug.LogWarning("[Exile] 탑 먼지 재질 없음 — 입자 파편 없이 봉인진 · 돌만");
 
+        // 11-11 리치 연출 렉 — 네 층을 한 프레임에 지으면 가리키는 순간 300 ms대 끊김(lich_spike 추방 시작 334~363 ms).
+        // 가리키는 1.8초 동안 짓고 있으니 층마다 한 프레임씩 나눈다(무대는 y −3000 — 화면에 안 든다).
         for (int i = 0; i < Layers.Length; i++)
+        {
             BuildLayer(i, stairs);
+            await UniTask.Yield(PlayerLoopTiming.Update, ct);
+        }
         BuildFloor();
         BuildLight();
     }

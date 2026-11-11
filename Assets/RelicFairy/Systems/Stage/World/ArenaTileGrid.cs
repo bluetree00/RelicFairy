@@ -36,7 +36,8 @@ public class ArenaTileGrid : MonoBehaviour
 
     // (10-03) 부서지는 느낌 — 칸이 꺼질 때 먼지 · 파편, 남은 이웃 가장자리에 균열(「메시가 그냥 비어 있는 느낌」 사용자 피드백)
     private const float DustScale            = 0.9f;   // SummonGround 배율 1 ≈ 반경 2.2 m(해골 소환 표식) — 칸(5 m)을 거의 덮는다
-    private const int   MaxDustPerFrame      = 12;     // 링 통째 붕괴(40여 칸)가 한 프레임에 다 뿜지 않게
+    private const int   MaxDustPerFrame      = 6;      // 링 통째 붕괴(40여 칸)가 한 프레임에 다 뿜지 않게(11-11 렉 12 → 6)
+    private const float DustEmission         = 0.35f;  // 붕괴 먼지 방출 배율 — 반복 · 광원도 끈다(LichVfxScaleCache.TrimForBurst · 11-11 렉)
     private const int   DebrisPerCell        = 3;
     private const int   MaxLiveDebris        = 90;
     private const float DebrisSeconds        = 1.4f;
@@ -706,7 +707,10 @@ public class ArenaTileGrid : MonoBehaviour
             _dustThisFrame = 0;
         }
         if (_dustThisFrame++ < MaxDustPerFrame)
-            LichVfx.Play(LichVfxSlot.SummonGround, CellTopWorld(cell, cell.Index.x, cell.Index.y), Quaternion.identity, DustScale);
+        {
+            var dust = LichVfx.Play(LichVfxSlot.SummonGround, CellTopWorld(cell, cell.Index.x, cell.Index.y), Quaternion.identity, DustScale);
+            if (dust != null && dust.TryGetComponent<LichVfxScaleCache>(out var cache)) cache.TrimForBurst(DustEmission);
+        }
 
         SpawnEdgeCracks(cell, crackSeconds);
         if (cell.DebrisMesh != null && _liveDebris + DebrisPerCell <= MaxLiveDebris)

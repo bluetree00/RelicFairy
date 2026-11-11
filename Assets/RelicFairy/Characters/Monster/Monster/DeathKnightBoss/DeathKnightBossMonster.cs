@@ -881,6 +881,7 @@ public class DeathKnightBossMonster : MonsterBase, IBoss, IBossEntrance, IPagedB
         Vector3 worldCenter = new Vector3(floorBounds.center.x, 0f, floorBounds.center.z);
         DKBossRoomContext.Initialize(width, height, 2f, worldCenter);
         GrowPastWalkableBorder();
+        DKBossRoomContext.WarmFloorHeights();   // 패턴 칸을 칸마다 실제 바닥 위에 깐다(11-11) — 첫 패턴에서 한꺼번에 재지 않게
     }
 
     /// <summary>

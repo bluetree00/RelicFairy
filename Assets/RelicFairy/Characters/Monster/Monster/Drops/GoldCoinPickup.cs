@@ -28,6 +28,8 @@ public class GoldCoinPickup : MonoBehaviour
     private const float AppearSeconds = 0.3f;   // 나타나기 디졸브 — 날아가는 동안(0.45초) 끝난다. 줍기 대기(0.4초)보다 짧게
     private const float CollectVanishSeconds = 0.18f;
     private const float ExpireVanishSeconds  = 0.6f;
+    private const float HomingDelay   = 0.8f;   // 보스 금화 — 내려앉은 모습을 잠깐 보인 뒤(날기 0.45초 + 0.35초) 거리와 상관없이 날아온다
+    private const float HomingSpeed   = 18f;
 
     // ── Static ───────────────────────────────────────────────
     private static readonly Color CoinColor = new Color(1f, 0.82f, 0.1f);
@@ -46,6 +48,7 @@ public class GoldCoinPickup : MonoBehaviour
     private bool      _arcing;
     private bool      _collected;
     private bool      _vanishing;
+    private bool      _homing;
     private Transform _playerTf;
     private GameObject _outline;   // 「~Outline」 — 내려앉으면 켠다(10-22)
 
@@ -93,9 +96,10 @@ public class GoldCoinPickup : MonoBehaviour
                     return;
                 }
 
-                if (dist <= MagnetRange)
+                bool homing = _homing && Time.time - _spawnTime >= HomingDelay;
+                if (dist <= MagnetRange || homing)
                 {
-                    transform.position += delta.normalized * MagnetSpeed * Time.deltaTime;
+                    transform.position += delta.normalized * (homing ? HomingSpeed : MagnetSpeed) * Time.deltaTime;
                     transform.Rotate(Vector3.up, SpinSpeed * Time.deltaTime, Space.World);
                 }
             }
@@ -110,8 +114,12 @@ public class GoldCoinPickup : MonoBehaviour
     }
 
     // ── Public Methods ───────────────────────────────────────
-    /// <summary>origin 주변에 골드 코인 count 개를 흩뿌려 스폰한다.</summary>
-    public static void SpawnDrops(Vector3 origin, int count, int valuePerCoin)
+    /// <summary>
+    /// origin 주변에 골드 코인 count 개를 흩뿌려 스폰한다.
+    /// <paramref name="homing"/> = 내려앉은 뒤 거리와 상관없이 플레이어에게 날아온다(보스 금화 — 11-11 사용자 「Ch3 기사 처치 후 보스 자리 골드를 못 줍는다」:
+    /// 기사 자리는 0.46 m 단 위(플레이어가 오르는 턱 0.35 m 위)라 끌림 거리 끝에 겨우 걸리고, 곧장 가면 그 앞에 솟은 다음 층 계단을 타고 방을 떠났다).
+    /// </summary>
+    public static void SpawnDrops(Vector3 origin, int count, int valuePerCoin, bool homing = false)
     {
         if (count <= 0 || valuePerCoin <= 0) return;
 
@@ -129,6 +137,7 @@ public class GoldCoinPickup : MonoBehaviour
 
             var coin = go.AddComponent<GoldCoinPickup>();
             coin.Initialize(startPos, landing, valuePerCoin);
+            coin._homing = homing;
             coin._outline = CurrencyVisuals.AttachOutline(go, CurrencyVisualKind.Gold);
             CurrencyVisuals.Appear(go, CurrencyVisualKind.Gold, AppearSeconds, CoinEdge);
         }

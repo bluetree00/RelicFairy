@@ -236,7 +236,7 @@ public class DKPhantomRushState : FullLockState<DKPhantomRushPatternSO>
         if (tilePrefab != null && DKBossRoomContext.IsInterior(pc.x, pc.y))
         {
             _warningTileGo = BossEffectPool.Spawn(tilePrefab,
-                DKBossRoomContext.CellToWorld(pc.x, pc.y, 0.05f),
+                DKBossRoomContext.TileToWorld(pc.x, pc.y, 0.05f),   // 칸 바닥 위(11-11)
                 Quaternion.Euler(-90f, 0f, 0f));
             if (_warningTileGo != null)
             {

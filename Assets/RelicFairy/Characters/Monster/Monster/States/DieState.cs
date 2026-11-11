@@ -125,7 +125,8 @@ public class DieState : IMonsterState
         float champion = MonsterTraits.IsChampion(ctx.Monster) ? MonsterTraits.ChampionGoldMul : 1f;   // 무작위 정예화(10-21)
         count = Mathf.Max(1, Mathf.RoundToInt(count * GoldScale(config.grade) * champion));
 
-        GoldCoinPickup.SpawnDrops(ctx.Monster.transform.position, count, drop.coinValue);
+        // 보스 금화는 플레이어에게 날아온다 — 보스는 단 위 · 결계 너머 · 공중에서 쓰러져 그 자리를 못 밟는 일이 있다(11-11 Ch3 기사)
+        GoldCoinPickup.SpawnDrops(ctx.Monster.transform.position, count, drop.coinValue, homing: config.grade == MonsterGrade.Boss);
     }
 
     /// <summary>

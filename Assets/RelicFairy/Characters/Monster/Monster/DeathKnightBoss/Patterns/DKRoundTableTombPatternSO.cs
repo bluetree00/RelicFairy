@@ -232,7 +232,7 @@ public class DKRoundTableTombState : FullLockState<DKRoundTableTombPatternSO>
         for (int x = _zone.MinX; x <= _zone.MaxX; x++)
         {
             if (_zone.IsCollapsed(x, z)) continue;
-            GameObject go = BossEffectPool.Spawn(prefab, _zone.CellCenter(x, z) + Vector3.up * TileY, Quaternion.Euler(-90f, 0f, 0f));
+            GameObject go = BossEffectPool.Spawn(prefab, DKBossRoomContext.TileToWorld(x, z, TileY), Quaternion.Euler(-90f, 0f, 0f));   // 칸 바닥 위(11-11)
             if (go == null) continue;
             go.transform.localScale = Vector3.one * DKBossRoomContext.CellSize;
             _tiles.Add(new DKTileInfo { Cell = new Vector2Int(x, z), Color = _swordColor, GO = go });

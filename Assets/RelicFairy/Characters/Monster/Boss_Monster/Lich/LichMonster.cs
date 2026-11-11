@@ -79,7 +79,7 @@ public class LichMonster : MonsterBase, IBoss, IBossEntrance, IBossHudSource
     protected override string HeadBoneName    => null;
     protected override float  HPBarHeadOffset => 0.25f;
     protected override bool   UseWorldHPBar   => false;
-    protected override float  BossHpScale     => StoryProgress.IsNightmareMode ? NightmareHpScale : 1f;
+    protected override float  BossHpScale     => (StoryProgress.IsNightmareMode ? NightmareHpScale : 1f) * EraBalance.BossHpScale((int)ChapterId.Chapter4);   // 11-11 해방기 · 악몽 ×1.5
 
     // ── IBoss ─────────────────────────────────────────────────
     public float HpRatio =>

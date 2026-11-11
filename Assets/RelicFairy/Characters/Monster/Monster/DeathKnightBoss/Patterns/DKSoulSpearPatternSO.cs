@@ -233,7 +233,7 @@ public class DKSoulSpearState : FullLockState<DKSoulSpearPatternSO>
         {
             if (!DKBossRoomContext.IsInterior(x, z)) continue;
             var go = BossEffectPool.Spawn(prefab,
-                DKBossRoomContext.CellToWorld(x, z, RowTileY),
+                DKBossRoomContext.TileToWorld(x, z, RowTileY),   // 칸 바닥 위(11-11)
                 Quaternion.Euler(-90f, 0f, 0f));
             if (go == null) continue;
             go.transform.localScale = Vector3.one * DKBossRoomContext.CellSize;

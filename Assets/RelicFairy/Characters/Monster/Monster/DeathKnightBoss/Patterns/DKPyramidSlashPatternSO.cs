@@ -334,7 +334,7 @@ public class DKPyramidSlashState : FullLockState<DKPyramidSlashPatternSO>
                 ? Data.whiteTilePrefab : Data.blackTilePrefab;
             if (prefab == null) continue;
 
-            Vector3    pos = DKBossRoomContext.CellToWorld(cell.x, cell.y, 0.05f);
+            Vector3    pos = DKBossRoomContext.TileToWorld(cell.x, cell.y, 0.05f);   // 칸마다 실제 바닥 위(11-11)
             GameObject go  = BossEffectPool.Spawn(prefab, pos, Quaternion.Euler(-90f, 0f, 0f));
             if (go == null) continue;
             go.transform.localScale = Vector3.one * DKBossRoomContext.CellSize;

@@ -3,6 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using RelicFairy.UI;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace RelicFairy.Monster
 {
@@ -18,6 +19,7 @@ public class DKDormantState : IMonsterState
 {
     private const float AutoTriggerTimeout        = 1.5f;
     private const float BossIntroFallbackDuration = 4.6f;
+    private const float GroundSnapRadius          = 2f;   // 등장 대기 전 NavMesh 높이로 붙이는 탐색 반경(11-11 인트로 뜸)
 
     private const float FallbackPanDuration    = 1.5f;
     private const float FallbackHoldDuration   = 2.0f;
@@ -51,6 +53,13 @@ public class DKDormantState : IMonsterState
         _cameraTriggered      = false;
         IsActive              = true;
         _room                 = UnityEngine.Object.FindFirstObjectByType<BossRoomController>();
+
+        // 11-11 인트로 뜸(세 번째) — 저장된 자리(인트로 변형 y 1.0)가 바닥(낮은 제단 0.46)보다 높을 때, 에이전트가 붙여 주기 전에
+        // 바로 끄면 등장 연출 내내 그 높이에 떠 있었다(전투 시작 Warp에서야 내려앉음). 끄기 전에 NavMesh 높이로 직접 붙인다.
+        float before = ctx.Transform.position.y;
+        if (NavMesh.SamplePosition(ctx.Transform.position, out NavMeshHit hit, GroundSnapRadius, NavMesh.AllAreas))
+            ctx.Transform.position = hit.position;
+        Debug.Log($"[DKDormant] 등장 대기 — 높이 {before:0.00} → {ctx.Transform.position.y:0.00}(NavMesh {(hit.hit ? "찾음" : "없음")})", ctx.Monster);
 
         if (ctx.Agent != null) ctx.Agent.enabled = false;
 

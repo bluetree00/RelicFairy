@@ -171,7 +171,7 @@ public class DKP2PassiveAttackRunner
         if (tilePrefab != null)
         {
             tileGo = BossEffectPool.Spawn(tilePrefab,
-                DKBossRoomContext.CellToWorld(pc.x, pc.y, 0.2f),   // 본 패턴 칸(0.05) 위 — 같은 높이면 겹쳐 안 보였다(10-13 검증 · 영혼 창 줄과 같은 높이)
+                DKBossRoomContext.TileToWorld(pc.x, pc.y, 0.2f),   // 본 패턴 칸(0.05) 위 — 같은 높이면 겹쳐 안 보였다(10-13 검증 · 영혼 창 줄과 같은 높이) · 칸 바닥 기준(11-11)
                 Quaternion.Euler(-90f, 0f, 0f));
             if (tileGo != null)
             {
