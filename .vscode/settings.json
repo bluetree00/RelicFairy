@@ -51,7 +51,7 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Project_Abyss.slnx",
+    "dotnet.defaultSolution": "RelicFairy.slnx",
     "todo-tree.general.tags": [
         "BUG",
         "TODO",

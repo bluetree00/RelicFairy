@@ -1,4 +1,4 @@
-# Abyss Development Status
+# Relic Fairy Development Status
 
 > 현재 진행 상황 및 공통 오류 관리 문서
 > Last Updated: 2026-05-19

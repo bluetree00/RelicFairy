@@ -1,6 +1,6 @@
-# Abyss - Core Architecture Documentation
+# Relic Fairy - Core Architecture Documentation
 
-> Project Abyss
+> Relic Fairy (구 Project Abyss)
 > Roguelike Action PC Game
 > Last Updated: 2026-05-11
 

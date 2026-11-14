@@ -1,5 +1,5 @@
 import json
-with open(r'C:\Users\u\Documents\GitHub\Project_Abyss\Assets\Abyss\Resources\STAGEDATA_MAP.json', 'r', encoding='utf-8') as f:
+with open(r'C:\Users\u\Documents\GitHub\RelicFairy\Assets\RelicFairy\Resources\STAGEDATA_MAP.json', 'r', encoding='utf-8') as f:
     data = json.load(f)
 print(f'Total rooms: {len(data["rooms"])}')
 for r in data['rooms']:

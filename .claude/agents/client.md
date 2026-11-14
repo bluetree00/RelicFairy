@@ -13,7 +13,7 @@ description: 게임 로직, 플레이어 시스템, 무기/스킬 데이터 구�
 
 ## 주요 담당 경로
 ```
-Assets/Abyss/Shared/Characters/
+Assets/RelicFairy/Shared/Characters/
   CharacterBase.cs                    ← 캐릭터 기본 (Animator, Rigidbody 초기화)
   IDamageable.cs, IKillable.cs        ← 데미지/킬 인터페이스
   State.cs, StateMachine.cs           ← 제네릭 FSM 베이스
@@ -47,19 +47,19 @@ Assets/Abyss/Shared/Characters/
     CharacterData.cs                  ← 캐릭터 스탯 SO (체력, 공격력, 이동속도)
     CharacterRoster.cs                ← 캐릭터 선택 목록
     WeaponRoster.cs                   ← 무기 선택 목록
-Assets/Abyss/Systems/Network/         ← 네트워크 로직
-Assets/Abyss/Characters/Player/Scripts/PlayerController.cs ← 플레이어 메인 컨트롤러
+Assets/RelicFairy/Systems/Network/         ← 네트워크 로직
+Assets/RelicFairy/Characters/Player/Scripts/PlayerController.cs ← 플레이어 메인 컨트롤러
 ```
 
 ## 관련 시스템 (읽기 참조용, 직접 수정 시 팀장 승인 필요)
 ```
-Assets/Abyss/Systems/Bootstrapper/Scripts/
+Assets/RelicFairy/Systems/Bootstrapper/Scripts/
   GameRunBootstrapper.cs              ← 전투 씬 초기화, 플레이어 스폰
-Assets/Abyss/Systems/Stage/RunGame/
+Assets/RelicFairy/Systems/Stage/RunGame/
   GameRunSession.cs                   ← 런 상태, 이벤트 (OnPlayerBound 등)
   PlayerLoadout.cs                    ← 로비→인게임 캐릭터/무기 핸드오프
   PlayerRunState.cs                   ← 런타임 HP/골드 (OnHpChanged 이벤트)
-Assets/Abyss/Systems/Managers/Scripts/
+Assets/RelicFairy/Systems/Managers/Scripts/
   Managers.cs                         ← 서비스 로케이터 (Managers.Instance)
   AddressableManager.cs               ← 에셋 로딩/해제
 ```
@@ -85,7 +85,7 @@ curl -s -X POST http://127.0.0.1:8080/mcp \
 - `UniTask` 사용 (코루틴 금지), `event Action` 기반 이벤트, `AddressableManager` 경유 로드
 - UI 연동이 필요한 경우 이벤트/콜백 인터페이스만 정의하고, 구현은 UIUX 팀원에게 위임
 - 데이터 구조 변경 시 팀장에게 먼저 보고 후 진행
-- ScriptableObject는 에셋 경로 규칙(`Assets/Abyss/.../Data/`) 준수
+- ScriptableObject는 에셋 경로 규칙(`Assets/RelicFairy/.../Data/`) 준수
 
 ## 완료 규칙
 - 작업이 끝나면 반드시 **팀장(기획자)에게 결과를 보고**한다

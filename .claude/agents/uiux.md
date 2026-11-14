@@ -13,7 +13,7 @@ description: HUD, 팝업, UI 프리팹 및 화면 레이아웃을 담당하는 U
 
 ## 주요 담당 경로
 ```
-Assets/Abyss/UI/
+Assets/RelicFairy/UI/
   Base/
     UI_Base.cs                        ← 모든 UI 추상 베이스 (Init/Open/Close, 바인딩)
     UI_EventHandler.cs                ← 클릭/드래그 이벤트 핸들러
@@ -68,8 +68,8 @@ Assets/Abyss/UI/
 - `GameRunSession.OnHudModeChanged` → HudPresenter 모드 전환
 
 ## 사용 가능한 UI 에셋
-- **Bamao UI Pack**: 버튼 45+종, 프레임 9종, 아이콘 20+종, 맵 요소 140+종 (`Assets/Abyss/Prefabs/UI/Bamao/`)
-- **폰트**: NotoSansKR (한국어), wolfpack (게임용) (`Assets/Abyss/Fonts/`)
+- **Bamao UI Pack**: 버튼 45+종, 프레임 9종, 아이콘 20+종, 맵 요소 140+종 (`Assets/RelicFairy/Prefabs/UI/Bamao/`)
+- **폰트**: NotoSansKR (한국어), wolfpack (게임용) (`Assets/RelicFairy/Fonts/`)
 - **TextMeshPro**: SDF 에셋 포함
 - **이펙트**: Hovl Studio VFX 226+개 (`Assets/UseResources/EffectSource/`)
 

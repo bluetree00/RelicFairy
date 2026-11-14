@@ -124,7 +124,7 @@ def new_slide(prs):
     return slide
 
 # ─── 1부 파일 로드 ─────────────────────────────────────────────
-PART1 = r"c:/Users/u/Documents/GitHub/Project_Abyss/Assets/Abyss/Docs/RelicFairy_Proposal_PART1.pptx"
+PART1 = r"c:/Users/u/Documents/GitHub/RelicFairy/Assets/RelicFairy/Docs/RelicFairy_Proposal_PART1.pptx"
 prs = Presentation(PART1)
 
 # ══════════════════════════════════════════════════════════════
@@ -663,7 +663,7 @@ add_text_box(slide, "v0.5  |  2026.05.21  |  랠릭페어리 기획팀",
              0, 7.1, 13.33, 0.3, font_size=10, color=GRAY_DARK, align=PP_ALIGN.CENTER)
 
 # ─── 최종 저장 ─────────────────────────────────────────────────
-OUTPUT = r"c:/Users/u/Documents/GitHub/Project_Abyss/Assets/Abyss/Docs/RelicFairy_Proposal.pptx"
+OUTPUT = r"c:/Users/u/Documents/GitHub/RelicFairy/Assets/RelicFairy/Docs/RelicFairy_Proposal.pptx"
 prs.save(OUTPUT)
 print("최종 저장 완료: " + OUTPUT)
 print("전체 슬라이드 수: " + str(len(prs.slides)) + "장")

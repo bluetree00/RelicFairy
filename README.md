@@ -1,4 +1,4 @@
-<h1 align="center">Project Abyss</h1>
+<h1 align="center">Relic Fairy</h1>
 <h3 align="center">Roguelike Action PC Game</h3>
 
 <p align="center">
@@ -9,7 +9,7 @@
 
 ## About Project
 
-<strong>Project Abyss</strong>는 스테이지 클리어 기반의 로그라이크 액션 PC 게임이다.  
+<strong>Relic Fairy</strong>(구 Project Abyss)는 스테이지 클리어 기반의 로그라이크 액션 PC 게임이다.  
 플레이어는 전투를 통해 장비와 퍼즐을 획득하고 조합하여 캐릭터를 성장시키며, 최종 챕터 클리어를 목표로 진행함.
 
 <br/>

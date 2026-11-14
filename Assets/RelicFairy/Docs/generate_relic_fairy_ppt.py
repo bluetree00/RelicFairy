@@ -850,7 +850,7 @@ add_text_box(slide, "전체 최대 강화 완료 시 필요 영혼의 잔재:  �
 
 # ──────────────────────────────────────────────
 # 여기서 1부 저장 (임시 — 2부에서 덮어씌움)
-OUTPUT_PART1 = r"c:/Users/u/Documents/GitHub/Project_Abyss/Assets/Abyss/Docs/RelicFairy_Proposal_PART1.pptx"
+OUTPUT_PART1 = r"c:/Users/u/Documents/GitHub/RelicFairy/Assets/RelicFairy/Docs/RelicFairy_Proposal_PART1.pptx"
 prs.save(OUTPUT_PART1)
 print("1부 저장 완료: " + OUTPUT_PART1)
 print("슬라이드 수 (1부): " + str(len(prs.slides)) + "장")
